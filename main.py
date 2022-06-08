@@ -5,10 +5,22 @@ import time
 import threading
 import random
 counter=0
-
+#       0--1
+counts=[0, 0]
 def DrawPixel(color):
     #"black"(0), "white"(1)
-    pass
+    global counter, counts
+    counter+=1
+    if counter > 9:
+        counter=0
+        print(
+            "Black: "+str(counts[0]),
+            "White: "+str(counts[1]),
+        )
+    if color == "black":
+        counts[0]+=1
+    elif color == "white":
+        counts[1]+=1
 
 #Pings All possible ip addresses
 def collectPings(aIn, bIn=0, cIn=0, dIn=0):
