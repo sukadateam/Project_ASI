@@ -41,6 +41,6 @@ for i in range(254):
             dumby=True #Ends section. Reloops until give range in complete.
 
 #Creates Threads
-for i in range(1):
+for i in range(254):
     createVarNameFromString(used[i], threading.Thread(target=collectPings, args=(i,)))
     globals()[used[i]].start()
