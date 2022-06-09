@@ -6,9 +6,10 @@ import threading
 import random
 import PIL
 from psutil import cpu_count, cpu_freq, cpu_stats, cpu_times
+import os
 counter=0
 #       0--1
-counts=[0, 0]
+counts=[0, 0] #Pixel Memory
 pixel_drawcount=0
 total_estPixels=254*255*255*255
 print(
@@ -17,16 +18,18 @@ print(
     )
 print('Total Core Count: ' + str(cpu_count()))
 print('Core Stats: '+str(cpu_stats()))
-time.sleep(5)
+time.sleep(2)
 
 def DrawPixel(color):
     global pixel_drawcount
 
+#Counts the amount of black and white pixels.
 def CountPixel(color):
     #"black"(0), "white"(1)
     global counter, counts
     counter+=1
     if counter > 49:
+        os.system('clear')
         counter=0
         print(
             "Black: "+str(counts[0]),
