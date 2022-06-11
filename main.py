@@ -4,21 +4,30 @@ from ping3 import ping, verbose_ping
 import time
 import threading
 import random
-import PIL
+from PIL import Image
 from psutil import cpu_count, cpu_freq, cpu_stats, cpu_times
 import os
+import ctypes
+import math
 counter=0
 #       0--1
 counts=[0, 0] #Pixel Memory
 pixel_drawcount=0
 total_estPixels=254*255*255*255
+SquareRoot=math.sqrt(total_estPixels)
+SquareRootRound=round(SquareRoot)
+TotalFit=SquareRoot*SquareRoot  
 print(
-    "Est Pixel Count: ", total_estPixels,
-    '\nPlease wait...'
+    "\nEst Pixel Count: ", total_estPixels,
+    "\nSquare Root: ", SquareRoot,
+    "\nRounded Square Root: ", SquareRootRound, 
+    "\nReverse Square Root: ", TotalFit, 
+    '\nPlease wait...\n'
     )
 print('Total Core Count: ' + str(cpu_count()))
 print('Core Stats: '+str(cpu_stats()))
-time.sleep(2)
+time.sleep(5555)
+image = Image.new('RGB', (100, 100))
 
 def DrawPixel(color):
     global pixel_drawcount
