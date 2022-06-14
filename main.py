@@ -1,16 +1,21 @@
-from dbm import dumb
-from ping3 import ping
-import time
-import threading
-import random
-from PIL import Image
-from psutil import cpu_count, cpu_stats
-import os
-import sys
-import math
-debug=True
+'''Version #: 0.1.2'''
+
+# Importing Essential Tools
+from dbm import dumb #I'm Dumb
+from ping3 import ping #Bing Bong.
+import time #What time is it?
+import threading #Not releated to sowing. Makes the program run faster by utilizing more cpu power.
+import random #Just a bit of random to spice things up :)
+from PIL import Image #Draws/Creates an image.
+from psutil import cpu_count, cpu_stats #What does my hardware; that I spent way to much on, look like?
+import os #Uses Operating System tools
+import sys #Uses System Hardware tools.
+import math #1 + 1 = 3 :)
+
+# Create Essential Variables.
+debug=True #Default = False
 counter=0
-os.chdir('Desktop')
+os.chdir('Desktop') #Sets the root directory. So I know where I am.
 #       0--1
 counts=[0, 0] #Pixel Memory
 pixel_drawcount=0
@@ -43,18 +48,16 @@ def DrawPixel(color):
     try:
         image.putpixel((DrawPixelCounterVert, DrawPixelCounterHorz), (colorSet))
     except Exception as Error:
-        print('Well shit.')
-        print('Failed with an except, saving...')
-        image.save('output-ip-addresses.png')
+        global CloseAllThreads
+        print('DrawPixel Error: Destroying Proccess!')
         print('Done saving. Safe to exit.')
-        CloseThreads()
-        time.sleep(1)
-        sys.exit()
+        CloseAllThreads()
+        CloseAllThreads.join()
     DrawPixelCounterHorz+=1
     if DrawPixelCounterHorz == SquareRootRound: 
         DrawPixelCounterVert+=1
-        print(DrawPixelCounterHorz)
-        time.sleep(555)
+        if debug==True:
+            time.sleep(55)
         DrawPixelCounterHorz=0
 
 # Counts the amount of black and white pixels.
@@ -86,10 +89,14 @@ def collectPings(aIn, bIn=0, cIn=0, dIn=0):
             for c in range(255):
                 for d in range(255):
                     #Returns False if Error and None if timed out.
-                    if ping(str((a+1)+int(aIn))+'.'+str(b+int(bIn))+'.'+str(c+int(cIn))+'.'+str(d+int(dIn)), timeout=0.50) in [False, None]:
-                        CountPixel('black')
-                    else:
-                        CountPixel('white')
+                    try:
+                        if ping(str((a+1)+int(aIn))+'.'+str(b+int(bIn))+'.'+str(c+int(cIn))+'.'+str(d+int(dIn)), timeout=0.10) in [False, None]:
+                            CountPixel('black')
+                        else:
+                            CountPixel('white')
+                    except:
+                        print("Well shit.")
+                        sys.exit()
 
 # Input sets(VarName, Var Equals) Outputs var with given name. Can be used to create randomly generated vars.
 def createVarNameFromString(var,other):
@@ -99,7 +106,6 @@ used=[] # Will be used later as a reference to terminate proccess after comeplet
 # Assigns random names for values.
 for i in range(254):
     dumby=False
-    print(i)
     while dumby==False:
         ab=''
         for i in range(6):
@@ -117,10 +123,14 @@ for i in range(254):
 def CloseThreads(args=None):
     global used
     for i in range(254):
+        print("Closing Thread:", i)
         globals()[used[i]].join()
+
+CloseAllThreads=threading.Thread(target=CloseThreads)
+
 # Closes safely
 def closeProgram():
     global image
     image.save('output-ip-addresses.png')
 
-CloseAllThreads=threading.Thread(target=CloseThreads)
+closeProgram()
