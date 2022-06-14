@@ -1,4 +1,4 @@
-'''Version #: 0.1.2'''
+'''Version #: 0.1.3'''
 
 # Importing Essential Tools
 from dbm import dumb #I'm Dumb
@@ -15,7 +15,12 @@ import math #1 + 1 = 3 :)
 # Create Essential Variables.
 debug=True #Default = False
 counter=0
-os.chdir('Desktop') #Sets the root directory. So I know where I am.
+threadCount=0 #Counts the amount of applicable threads created(exempting the orginal process).
+ClosingInProgress=False #Lets other threads know an error has occured.
+try:
+    os.chdir('Desktop') #Sets the root directory. So I know where I am.
+except:
+    pass
 #       0--1
 counts=[0, 0] #Pixel Memory
 pixel_drawcount=0
@@ -36,6 +41,27 @@ if debug==False:
     print('Launching in 5 seconds...')
     time.sleep(5) #Default = 5
 
+class MyThread(threading.Thread):
+ 
+    # Thread class with a _stop() method.
+    # The thread itself has to check
+    # regularly for the stopped() condition.
+ 
+    def __init__(self, *args, **kwargs):
+        super(MyThread, self).__init__(*args, **kwargs)
+        self._stop = threading.Event()
+ 
+    # function using _stop function
+    def stop(self):
+        self._stop.set()
+ 
+    def stopped(self):
+        return self._stop.isSet()
+ 
+    def run(self):
+        global threadCount
+        collectPings(threadCount)
+
 image = Image.new('RGB', (int(SquareRootRound), int(SquareRoot)))
 DrawPixelCounterVert=0
 DrawPixelCounterHorz=0 #Protects the system from drawing invisible pixels/Causing Errors
@@ -48,11 +74,10 @@ def DrawPixel(color):
     try:
         image.putpixel((DrawPixelCounterVert, DrawPixelCounterHorz), (colorSet))
     except Exception as Error:
-        global CloseAllThreads
-        print('DrawPixel Error: Destroying Proccess!')
-        print('Done saving. Safe to exit.')
-        CloseAllThreads()
-        CloseAllThreads.join()
+        global CloseAllThreads, ClosingInProgress
+        if ClosingInProgress==False:
+            CloseThreads()
+            ClosingInProgress=True
     DrawPixelCounterHorz+=1
     if DrawPixelCounterHorz == SquareRootRound: 
         DrawPixelCounterVert+=1
@@ -80,23 +105,25 @@ def CountPixel(color):
 
 # Pings All possible IP addresses
 def collectPings(aIn, bIn=0, cIn=0, dIn=0):
-    for a in range(254):
-        if a>0:
-            print('A Section Hit: '+str((a+1)+int(aIn)))
-        for b in range(255):
-            if b>0:
-                print('B section Hit: '+str((a+1)+int(aIn))+'.'+str(b+int(bIn)))
-            for c in range(255):
-                for d in range(255):
-                    #Returns False if Error and None if timed out.
-                    try:
-                        if ping(str((a+1)+int(aIn))+'.'+str(b+int(bIn))+'.'+str(c+int(cIn))+'.'+str(d+int(dIn)), timeout=0.10) in [False, None]:
-                            CountPixel('black')
-                        else:
-                            CountPixel('white')
-                    except:
-                        print("Well shit.")
-                        sys.exit()
+    global ClosingInProgress
+    if ClosingInProgress==False: #Destroys the process ability to continue.
+        for a in range(254):
+            if a>0:
+                print('A Section Hit: '+str((a+1)+int(aIn)))
+            for b in range(255):
+                if b>0:
+                    print('B section Hit: '+str((a+1)+int(aIn))+'.'+str(b+int(bIn)))
+                for c in range(255):
+                    for d in range(255):
+                        #Returns False if Error and None if timed out.
+                        try:
+                            if ping(str((a+1)+int(aIn))+'.'+str(b+int(bIn))+'.'+str(c+int(cIn))+'.'+str(d+int(dIn)), timeout=0.50) in [False, None]:
+                                CountPixel('black')
+                            else:
+                                CountPixel('white')
+                        except:
+                            print("Well shit.")
+                            sys.exit()
 
 # Input sets(VarName, Var Equals) Outputs var with given name. Can be used to create randomly generated vars.
 def createVarNameFromString(var,other):
@@ -116,7 +143,7 @@ for i in range(254):
 
 # Creates Threads
 for i in range(254):
-    createVarNameFromString(used[i], threading.Thread(target=collectPings, args=(i,)))
+    createVarNameFromString(used[i], MyThread())
     globals()[used[i]].start()
 
 # Closes Existing Threads without closing the main proccess.
@@ -124,7 +151,7 @@ def CloseThreads(args=None):
     global used
     for i in range(254):
         print("Closing Thread:", i)
-        globals()[used[i]].join()
+        globals()[used[i]].stop()
 
 CloseAllThreads=threading.Thread(target=CloseThreads)
 
