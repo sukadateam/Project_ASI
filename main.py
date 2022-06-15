@@ -1,4 +1,4 @@
-'''Version #: 0.1.3'''
+'''Version #: 0.1.4'''
 while input("Hit Enter To Start: ") == None:
     pass
 # Importing Essential Tools
@@ -67,6 +67,12 @@ def DrawPixel(color):
     if color == "white":
         colorSet=(255, 255, 255)
     global pixel_drawcount, image, DrawPixelCounterVert, DrawPixelCounterHorz
+    if DrawPixelCounterHorz == SquareRootRound: 
+        DrawPixelCounterVert+=1
+        if debug==True:
+            print('DrawPixelCounterVert: ', DrawPixelCounterVert)
+            time.sleep(.5)
+        DrawPixelCounterHorz=0
     try:
         image.putpixel((DrawPixelCounterVert, DrawPixelCounterHorz), (colorSet))
     except Exception as Error:
@@ -76,14 +82,6 @@ def DrawPixel(color):
             ClosingInProgress=True
             sys.exit()
     DrawPixelCounterHorz+=1
-    if DrawPixelCounterHorz == SquareRootRound: 
-        DrawPixelCounterVert+=1
-        if debug==True:
-            print('DrawPixelCounterVert: ', DrawPixelCounterVert)
-        if debug==True:
-            while input("Hit Enter: ") == None:
-                pass
-        DrawPixelCounterHorz=0
 
 # Counts the amount of black and white pixels.
 def CountPixel(color):
