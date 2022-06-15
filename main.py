@@ -1,5 +1,6 @@
 '''Version #: 0.1.3'''
-
+while input("Hit Enter To Start: ") == None:
+    pass
 # Importing Essential Tools
 from dbm import dumb #I'm Dumb
 from ping3 import ping #Bing Bong.
@@ -41,24 +42,19 @@ if debug==False:
     print('Launching in 5 seconds...')
     time.sleep(5) #Default = 5
 
+# Partial Credit(StackOverflow) From, Unknown user.
 class MyThread(threading.Thread):
- 
-    # Thread class with a _stop() method.
-    # The thread itself has to check
-    # regularly for the stopped() condition.
- 
     def __init__(self, *args, **kwargs):
         super(MyThread, self).__init__(*args, **kwargs)
         self._stop = threading.Event()
- 
-    # function using _stop function
     def stop(self):
+        # Kill code
         self._stop.set()
- 
     def stopped(self):
+        # Returns the stop status
         return self._stop.isSet()
- 
     def run(self):
+        # Edit this function to change each/all threads purpose.
         global threadCount
         collectPings(threadCount)
 
@@ -78,11 +74,15 @@ def DrawPixel(color):
         if ClosingInProgress==False:
             CloseThreads()
             ClosingInProgress=True
+            sys.exit()
     DrawPixelCounterHorz+=1
     if DrawPixelCounterHorz == SquareRootRound: 
         DrawPixelCounterVert+=1
         if debug==True:
-            time.sleep(55)
+            print('DrawPixelCounterVert: ', DrawPixelCounterVert)
+        if debug==True:
+            while input("Hit Enter: ") == None:
+                pass
         DrawPixelCounterHorz=0
 
 # Counts the amount of black and white pixels.
